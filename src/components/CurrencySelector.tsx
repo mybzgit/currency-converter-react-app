@@ -1,32 +1,30 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent } from 'react';
 import {
     Autocomplete,
     AutocompleteChangeReason,
     Box,
     TextField,
 } from '@mui/material';
-import supportedCodesJson from './supported-codes.json';
+
 import { useDispatch, useSelector } from 'react-redux';
-import { State, Action, ActionTypes, CodeType } from './store';
+import { Action, ActionTypes, State } from '../store/store';
+import { CodeType } from '../store/types';
 
 type CurrencySelectorProps = {
     directionType: 'from' | 'to';
+    selectedCurrency: CodeType;
 };
-
-interface SupportedCodesResponse {
-    result: string;
-    supported_codes: [string, string][];
-}
 
 const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     directionType,
+    selectedCurrency,
 }) => {
 
     const dispatch = useDispatch();
-    const selectedCurrency = useSelector((state: State) => {
-        return directionType === 'from' ? state.fromCode : state.toCode;
+
+    const supportedCodes = useSelector((state: State) => {
+        return state.supportedCodes;
     });
-    const [supportedCodes, setSupportedCodes] = useState<CodeType[]>([]);
 
     const createAction = (payload: CodeType): Action => {
         let action: Action;
@@ -49,14 +47,6 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
         }
         return action;
     };
-
-    useEffect(() => {
-        setSupportedCodes(
-            supportedCodesJson.supported_codes.map((c) => {
-                return { code: c[0], description: c[1] };
-            })
-        );
-    }, []);
 
     const onChange = (
         event: SyntheticEvent,
