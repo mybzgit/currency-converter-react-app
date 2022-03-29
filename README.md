@@ -1,1 +1,1 @@
-## currency-coverter-react-app
+## currency-converter-react-app
