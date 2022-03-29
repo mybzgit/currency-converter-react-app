@@ -1,12 +1,14 @@
 import { createStore, Reducer, Store } from 'redux';
-import { CodeType, ConversionRate } from './types';
+import { CodeType } from './types';
 
 export type State = {
     fromCode: CodeType;
     toCode: CodeType;
     supportedCodes: CodeType[];
-    convertionRatesFromCode: ConversionRate;
-    convertionRatesToCode: ConversionRate;
+    convertionRatesFromCode: number;
+    convertionRatesToCode: number;
+    fromInputValue: string;
+    toInputValue: string;
 };
 
 export enum ActionTypes {
@@ -16,6 +18,8 @@ export enum ActionTypes {
     SET_CONVERSION_RATES_FROM_CODE,
     SET_CONVERSION_RATES_TO_CODE,
     SET_SUPPORTED_CODES,
+    SET_FROM_VALUE,
+    SET_TO_VALUE
 }
 
 export type Action = {
@@ -23,71 +27,72 @@ export type Action = {
     fromCode?: CodeType;
     toCode?: CodeType;
     supportedCodes?: CodeType[];
-    convertionRatesFromCode?: ConversionRate;
-    convertionRatesToCode?: ConversionRate;
+    convertionRatesFromCode?: number;
+    convertionRatesToCode?: number;
+    fromInputValue?: string;
+    toInputValue?: string;
 };
 
 const initialState: State = {
     fromCode: { code: 'USD', description: 'United States Dollar' },
     toCode: { code: 'RUB', description: 'Russian Ruble' },
     supportedCodes: [],
-    convertionRatesFromCode: {},
-    convertionRatesToCode: {}
+    convertionRatesFromCode: 0,
+    convertionRatesToCode: 0,
+    fromInputValue: '',
+    toInputValue: ''
 };
 
 const reducer: Reducer<State, Action> = (state = initialState, action) => {
     if (action.type == ActionTypes.SET_FROM_CODE) {
         return {
+            ...state,
             fromCode: { ...action.fromCode! },
-            toCode: { ...state.toCode },
-            supportedCodes: [...state.supportedCodes],
-            convertionRatesFromCode: { ...state.convertionRatesFromCode },
-            convertionRatesToCode: { ...state.convertionRatesToCode },
         };
     }
     if (action.type == ActionTypes.SET_TO_CODE) {
         return {
-            fromCode: { ...state.fromCode },
-            toCode: { ...action.toCode! },
-            supportedCodes: [...state.supportedCodes],
-            convertionRatesFromCode: { ...state.convertionRatesFromCode },
-            convertionRatesToCode: { ...state.convertionRatesToCode },
+            ...state,
+            toCode: { ...action.toCode! }
         };
     }
     if (action.type == ActionTypes.SWAP_CODES) {
         return {
+            ...state,
             fromCode: { ...state.toCode },
             toCode: { ...state.fromCode },
-            supportedCodes: [...state.supportedCodes],
-            convertionRatesFromCode: { ...state.convertionRatesFromCode },
-            convertionRatesToCode: { ...state.convertionRatesToCode },
+            fromInputValue: state.toInputValue,
+            toInputValue: state.fromInputValue
         };
     }
     if (action.type == ActionTypes.SET_SUPPORTED_CODES) {
         return {
-            fromCode: { ...state.fromCode },
-            toCode: { ...state.toCode },
-            supportedCodes: [...action.supportedCodes!],
-            convertionRatesFromCode: { ...state.convertionRatesFromCode },
-            convertionRatesToCode: { ...state.convertionRatesToCode },
+            ...state,
+            supportedCodes: [...action.supportedCodes!]
         };
     }
     if (action.type == ActionTypes.SET_CONVERSION_RATES_FROM_CODE) {
         return {
-            fromCode: { ...state.fromCode },
-            toCode: { ...state.toCode },
-            supportedCodes: [...state.supportedCodes],
-            convertionRatesFromCode: { ...action.convertionRatesFromCode! },
-            convertionRatesToCode: { ...state.convertionRatesToCode },
+            ...state,
+            convertionRatesFromCode: action.convertionRatesFromCode!
         };
     }
     if (action.type == ActionTypes.SET_CONVERSION_RATES_TO_CODE) {
         return {
-            fromCode: { ...state.fromCode },
-            toCode: { ...state.toCode },
-            supportedCodes: [...state.supportedCodes],
-            convertionRatesFromCode: { ...state.convertionRatesFromCode },
-            convertionRatesToCode: { ...action.convertionRatesToCode! },
+            ...state,
+            convertionRatesToCode: action.convertionRatesToCode!
+        };
+    }
+    if (action.type == ActionTypes.SET_FROM_VALUE) {
+        return {
+            ...state,
+            fromInputValue: action.fromInputValue!
+        };
+    }
+    if (action.type == ActionTypes.SET_TO_VALUE) {
+        return {
+            ...state,
+            toInputValue: action.toInputValue!
         };
     }
     return state;

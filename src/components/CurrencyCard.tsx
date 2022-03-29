@@ -14,7 +14,8 @@ type CurrencyCardProps = {
 
 const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
     // const conversionRates = useSelector((state: State) => {
-    //     return state.convertionRatesToBaseCode;
+    //     if (directionType === 'from') return state.convertionRatesFromCode;
+    //     else return state.convertionRatesToCode;
     // });
 
     const [convertedValue, setConvertedValue] = useState(0);
@@ -23,12 +24,29 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
         return directionType === 'from' ? state.fromCode : state.toCode;
     });
     const currencyToConvert = useSelector((state: State) => {
-        return directionType === 'to' ? state.fromCode : state.toCode;
+        return directionType === 'from' ? state.toCode : state.fromCode;
     });
 
+    const [conversionRates, setConversionRates] = useState<ConversionRate>({});
+
     useEffect(() => {
+        const action: Action = {
+            type:
+                directionType === 'from'
+                    ? ActionTypes.SET_CONVERSION_RATES_FROM_CODE
+                    : ActionTypes.SET_CONVERSION_RATES_TO_CODE,
+            convertionRatesFromCode:
+                directionType === 'from'
+                    ? conversionRates[currencyToConvert.code]
+                    : 0,
+            convertionRatesToCode:
+                directionType === 'to'
+                    ? conversionRates[currencyToConvert.code]
+                    : 0,
+        };
+        dispatch(action);
         setConvertedValue(conversionRates[currencyToConvert.code]);
-    }, [selectedCurrency.code, currencyToConvert.code]);
+    }, [currencyToConvert.code, conversionRates]);
 
     const exchangeRatesUrl =
         'https://v6.exchangerate-api.com/v6/f85e1ab717a788b92e1bf176/latest/';
@@ -36,20 +54,15 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // axios
-        //     .get<ConversionRatesResponse>(
-        //         exchangeRatesUrl + selectedCurrency.code
-        //     )
-        //     .then((response) => {
-        //         if (response.data.result === 'success') {
-        //             const action: Action = {
-        //                 type: ActionTypes.SET_CONVERSION_RATES,
-        //                 convertionRates: response.data
-        //                     .conversion_rates as ConversionRate,
-        //             };
-        //             dispatch(action);
-        //         }
-        //     });
+        axios
+            .get<ConversionRatesResponse>(
+                exchangeRatesUrl + selectedCurrency.code
+            )
+            .then((response) => {
+                if (response.data.result === 'success') {
+                    setConversionRates({ ...response.data.conversion_rates });
+                }
+            });
     }, [selectedCurrency.code]);
 
     const unitInfo = `1 ${selectedCurrency.code} = ${convertedValue} ${currencyToConvert.code}`;
@@ -62,7 +75,9 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
                     selectedCurrency={selectedCurrency}
                 />
                 <UserInput directionType={directionType} />
-                <span className={classes.unit_info}>{unitInfo}</span>
+                {convertedValue && (
+                    <span className={classes.unit_info}>{unitInfo}</span>
+                )}
             </CardContent>
         </Card>
     );
