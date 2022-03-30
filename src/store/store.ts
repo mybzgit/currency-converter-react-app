@@ -1,4 +1,4 @@
-import { compose, createStore, Reducer, Store } from 'redux';
+import { createStore, Reducer, Store } from 'redux';
 import { CodeType } from './types';
 
 export type State = {
