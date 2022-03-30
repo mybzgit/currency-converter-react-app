@@ -6,25 +6,38 @@ import { useDispatch } from 'react-redux';
 import { Action, ActionTypes } from './store/store';
 import { useEffect } from 'react';
 
-import supportedCodesJson from './supported-codes.json';
+import axios from 'axios';
+import { SupportedCodesResponse } from './store/types';
 
 function App() {
     const dispatch = useDispatch();
+
     const onSwapCurrencies = () => {
         dispatch({ type: ActionTypes.SWAP_CODES });
     };
 
     useEffect(() => {
-        // const supportedCodesUrl =
-        //     'https://v6.exchangerate-api.com/v6/f85e1ab717a788b92e1bf176/codes';
+        const supportedCodesUrl =
+            'https://v6.exchangerate-api.com/v6/f85e1ab717a788b92e1bf176/codes';
 
-        const action: Action = {
-            type: ActionTypes.SET_SUPPORTED_CODES,
-            supportedCodes: supportedCodesJson.supported_codes.map((c) => {
-                return { code: c[0], description: c[1] };
-            }),
-        };
-        dispatch(action);
+        axios
+            .get<SupportedCodesResponse>(supportedCodesUrl)
+            .then((response) => {
+                if (response.data.result === 'success') {
+                    const action: Action = {
+                        type: ActionTypes.SET_SUPPORTED_CODES,
+                        supportedCodes: response.data.supported_codes.map(
+                            (c) => {
+                                return { code: c[0], description: c[1] };
+                            }
+                        ),
+                    };
+                    dispatch(action);
+                }
+            })
+            .catch((error) => {
+                alert('The list of supported currencies is loaded with error');
+            });
     }, []);
 
     return (

@@ -2,7 +2,6 @@ import TextField from '@mui/material/TextField';
 import React, {
     ChangeEvent,
     ChangeEventHandler,
-    Fragment,
     useEffect,
     useState,
 } from 'react';
@@ -26,55 +25,70 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
             : state.toInputValue;
     });
 
-    const [inputValue, setInputValue] = useState(currentValue);
-
     const dispatch = useDispatch();
 
+    const [inputValue, setInputValue] = useState('');
 
     const onValueChange: ChangeEventHandler<HTMLInputElement> = (
         event: ChangeEvent<HTMLInputElement>
     ) => {
-        setInputValue(event.target.value);
-        dispatch({
-            type: (directionType === 'from' ? ActionTypes.SET_FROM_VALUE : ActionTypes.SET_TO_VALUE),
-            toInputValue: event.target.value,
-            fromInputValue: event.target.value
-        });
+        if (event.target.value) {
+            setInputValue(event.target.value);
+        }
     };
 
-    const createAction = (value: string): Action => {
-        let action: Action;
+    const sendInputValues = (
+        currentValue: string,
+        convertedValue: string
+    ): Action => {
+        let action: Action = {
+            type: ActionTypes.SET_INPUT_VALUES,
+        };
         if (directionType === 'from') {
-            action = {
-                type: ActionTypes.SET_TO_VALUE,
-                toInputValue: value,
-            };
+            action.fromInputValue = currentValue;
+            action.toInputValue = convertedValue;
         } else {
-            action = {
-                type: ActionTypes.SET_FROM_VALUE,
-                fromInputValue: value,
-            };
+            action.fromInputValue = convertedValue;
+            action.toInputValue = currentValue;
         }
         return action;
     };
 
+    const calculateConvertedValue = (value: number): string => {
+        let intPart = Math.trunc(value);
+        return (value - intPart > 0) ? value.toFixed(4) : intPart.toString();
+    };
+
     useEffect(() => {
-        console.log(+inputValue * conversionRate);
-        dispatch(createAction((+inputValue * conversionRate).toFixed(4).toString()));
-    }, [conversionRate, inputValue]);
+        if (conversionRate > 0 && inputValue !== '') {
+            const newConvertedValue = calculateConvertedValue(
+                +inputValue * conversionRate
+            );
+            dispatch(sendInputValues(inputValue, newConvertedValue));
+        }
+    }, [inputValue]);
+
+    useEffect(() => {
+        if (conversionRate > 0 && directionType === 'from') {
+            const newConvertedValue = calculateConvertedValue(
+                +currentValue * conversionRate
+            );
+            dispatch(
+                sendInputValues(currentValue, newConvertedValue.toString())
+            );
+        }
+    }, [conversionRate]);
 
     return (
-        <Fragment>
-            <TextField
-                sx={{ mt: 2, width: '100%' }}
-                id="standard-basic"
-                variant="standard"
-                type="number"
-                onChange={onValueChange}
-                value={currentValue}
-                inputProps={{ style: { fontSize: 30, fontWeight: 600 } }}
-            />
-        </Fragment>
+        <TextField
+            sx={{ mt: 2, width: '100%' }}
+            id="standard-basic"
+            variant="standard"
+            type="number"
+            onChange={onValueChange}
+            value={currentValue}
+            inputProps={{ min: 0, style: { fontSize: 30, fontWeight: 600 } }}
+        />
     );
 };
 

@@ -13,10 +13,6 @@ type CurrencyCardProps = {
 };
 
 const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
-    // const conversionRates = useSelector((state: State) => {
-    //     if (directionType === 'from') return state.convertionRatesFromCode;
-    //     else return state.convertionRatesToCode;
-    // });
 
     const [convertedValue, setConvertedValue] = useState(0);
 
@@ -28,6 +24,8 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
     });
 
     const [conversionRates, setConversionRates] = useState<ConversionRate>({});
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const action: Action = {
@@ -51,8 +49,6 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
     const exchangeRatesUrl =
         'https://v6.exchangerate-api.com/v6/f85e1ab717a788b92e1bf176/latest/';
 
-    const dispatch = useDispatch();
-
     useEffect(() => {
         axios
             .get<ConversionRatesResponse>(
@@ -62,7 +58,10 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
                 if (response.data.result === 'success') {
                     setConversionRates({ ...response.data.conversion_rates });
                 }
-            });
+            })
+            .catch((error) => {
+                setConvertedValue(0);
+            });;
     }, [selectedCurrency.code]);
 
     const unitInfo = `1 ${selectedCurrency.code} = ${convertedValue} ${currencyToConvert.code}`;
@@ -75,8 +74,11 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
                     selectedCurrency={selectedCurrency}
                 />
                 <UserInput directionType={directionType} />
-                {convertedValue && (
+                {!!convertedValue && (
                     <span className={classes.unit_info}>{unitInfo}</span>
+                )}
+                {!convertedValue && (
+                    <span className={classes.unit_info}>Unable to load latest exchange rate for the {selectedCurrency.code} currency</span>
                 )}
             </CardContent>
         </Card>

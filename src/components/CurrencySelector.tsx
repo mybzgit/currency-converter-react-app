@@ -19,7 +19,6 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     directionType,
     selectedCurrency,
 }) => {
-
     const dispatch = useDispatch();
 
     const supportedCodes = useSelector((state: State) => {
@@ -31,18 +30,12 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
         if (directionType === 'from') {
             action = {
                 type: ActionTypes.SET_FROM_CODE,
-                fromCode: {
-                    code: payload.code,
-                    description: payload.description,
-                },
+                fromCode: { ...payload },
             };
         } else {
             action = {
                 type: ActionTypes.SET_TO_CODE,
-                toCode: {
-                    code: payload.code,
-                    description: payload.description,
-                },
+                toCode: { ...payload }
             };
         }
         return action;
