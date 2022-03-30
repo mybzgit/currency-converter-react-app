@@ -6,38 +6,33 @@ import {
     TextField,
 } from '@mui/material';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { Action, ActionTypes, State } from '../store/store';
+import { useDispatch } from 'react-redux';
+import { Action, ActionTypes } from '../store/store';
 import { CodeType } from '../store/types';
 
 type CurrencySelectorProps = {
     directionType: 'from' | 'to';
     selectedCurrency: CodeType;
+    supportedCodes: CodeType[];
 };
 
 const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     directionType,
     selectedCurrency,
+    supportedCodes,
 }) => {
     const dispatch = useDispatch();
 
-    const supportedCodes = useSelector((state: State) => {
-        return state.supportedCodes;
-    });
-
     const createAction = (payload: CodeType): Action => {
         let action: Action;
-        if (directionType === 'from') {
-            action = {
-                type: ActionTypes.SET_FROM_CODE,
-                fromCode: { ...payload },
-            };
-        } else {
-            action = {
-                type: ActionTypes.SET_TO_CODE,
-                toCode: { ...payload }
-            };
-        }
+        action = {
+            type:
+                directionType === 'from'
+                    ? ActionTypes.SET_FROM_CODE
+                    : ActionTypes.SET_TO_CODE,
+            fromCode: { ...payload },
+            toCode: { ...payload },
+        };
         return action;
     };
 
@@ -54,7 +49,7 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 
     return (
         <Autocomplete
-            id="combo-box"
+            id={'combo-box-' + directionType}
             value={selectedCurrency}
             onChange={onChange}
             getOptionLabel={(option) => option.code}

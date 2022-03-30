@@ -39,7 +39,7 @@ const initialState: State = {
     convertionRatesFromCode: 0,
     convertionRatesToCode: 0,
     fromInputValue: '0',
-    toInputValue: '0'
+    toInputValue: '0',
 };
 
 const reducer: Reducer<State, Action> = (state = initialState, action) => {
@@ -52,7 +52,7 @@ const reducer: Reducer<State, Action> = (state = initialState, action) => {
     if (action.type == ActionTypes.SET_TO_CODE) {
         return {
             ...state,
-            toCode: { ...action.toCode! }
+            toCode: { ...action.toCode! },
         };
     }
     if (action.type == ActionTypes.SWAP_CODES) {
@@ -65,34 +65,31 @@ const reducer: Reducer<State, Action> = (state = initialState, action) => {
     if (action.type == ActionTypes.SET_SUPPORTED_CODES) {
         return {
             ...state,
-            supportedCodes: [...action.supportedCodes!]
+            supportedCodes: [...action.supportedCodes!],
         };
     }
     if (action.type == ActionTypes.SET_CONVERSION_RATES_FROM_CODE) {
         return {
             ...state,
-            convertionRatesFromCode: action.convertionRatesFromCode!
+            convertionRatesFromCode: action.convertionRatesFromCode!,
         };
     }
     if (action.type == ActionTypes.SET_CONVERSION_RATES_TO_CODE) {
         return {
             ...state,
-            convertionRatesToCode: action.convertionRatesToCode!
+            convertionRatesToCode: action.convertionRatesToCode!,
         };
     }
     if (action.type == ActionTypes.SET_INPUT_VALUES) {
         return {
             ...state,
             fromInputValue: action.fromInputValue!,
-            toInputValue: action.toInputValue!
+            toInputValue: action.toInputValue!,
         };
     }
     return state;
 };
 
-export const composeEnhancers =
-  (window && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
-
-const store: Store<State, Action> = createStore(reducer,composeEnhancers());
+const store: Store<State, Action> = createStore(reducer);
 
 export default store;

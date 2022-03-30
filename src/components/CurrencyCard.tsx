@@ -6,14 +6,21 @@ import classes from './CurrencyCard.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { Action, ActionTypes, State } from '../store/store';
 import axios from 'axios';
-import { ConversionRate, ConversionRatesResponse } from '../store/types';
+import {
+    CodeType,
+    ConversionRate,
+    ConversionRatesResponse,
+} from '../store/types';
 
 type CurrencyCardProps = {
     directionType: 'from' | 'to';
+    supportedCodes: CodeType[];
 };
 
-const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
-
+const CurrencyCard: React.FC<CurrencyCardProps> = ({
+    directionType,
+    supportedCodes,
+}) => {
     const [convertedValue, setConvertedValue] = useState(0);
 
     const selectedCurrency = useSelector((state: State) => {
@@ -61,7 +68,7 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
             })
             .catch((error) => {
                 setConvertedValue(0);
-            });;
+            });
     }, [selectedCurrency.code]);
 
     const unitInfo = `1 ${selectedCurrency.code} = ${convertedValue} ${currencyToConvert.code}`;
@@ -70,6 +77,7 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
         <Card sx={{ minWidth: 300, height: 200 }}>
             <CardContent>
                 <CurrencySelector
+                    supportedCodes={supportedCodes}
                     directionType={directionType}
                     selectedCurrency={selectedCurrency}
                 />
@@ -78,7 +86,10 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({ directionType }) => {
                     <span className={classes.unit_info}>{unitInfo}</span>
                 )}
                 {!convertedValue && (
-                    <span className={classes.unit_info}>Unable to load latest exchange rate for the {selectedCurrency.code} currency</span>
+                    <span className={classes.unit_info}>
+                        Unable to load latest exchange rate for the{' '}
+                        {selectedCurrency.code} currency
+                    </span>
                 )}
             </CardContent>
         </Card>

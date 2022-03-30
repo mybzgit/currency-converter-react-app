@@ -1,20 +1,19 @@
 import './App.css';
 import CurrencyCard from './components/CurrencyCard';
-import { Button } from '@mui/material';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { useDispatch } from 'react-redux';
-import { Action, ActionTypes } from './store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { Action, ActionTypes, State } from './store/store';
 import { useEffect } from 'react';
 
 import axios from 'axios';
 import { SupportedCodesResponse } from './store/types';
+import SwapButton from './components/SwapButton';
 
 function App() {
     const dispatch = useDispatch();
 
-    const onSwapCurrencies = () => {
-        dispatch({ type: ActionTypes.SWAP_CODES });
-    };
+    const supportedCodes = useSelector((state: State) => {
+        return state.supportedCodes;
+    });
 
     useEffect(() => {
         const supportedCodesUrl =
@@ -42,11 +41,15 @@ function App() {
 
     return (
         <div className="App">
-            <CurrencyCard directionType="from" />
-            <Button onClick={onSwapCurrencies}>
-                <SwapHorizIcon fontSize="large" />
-            </Button>
-            <CurrencyCard directionType="to" />
+            <CurrencyCard
+                supportedCodes={supportedCodes}
+                directionType="from"
+            />
+            <SwapButton />
+            <CurrencyCard
+                supportedCodes={supportedCodes}
+                directionType="to"
+            />
         </div>
     );
 }

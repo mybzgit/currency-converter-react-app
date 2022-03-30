@@ -56,7 +56,7 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
 
     const calculateConvertedValue = (value: number): string => {
         let intPart = Math.trunc(value);
-        return (value - intPart > 0) ? value.toFixed(4) : intPart.toString();
+        return value - intPart > 0 ? value.toFixed(4) : intPart.toString();
     };
 
     useEffect(() => {
