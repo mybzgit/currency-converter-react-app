@@ -2,6 +2,7 @@ import TextField from '@mui/material/TextField';
 import React, {
     ChangeEvent,
     ChangeEventHandler,
+    useCallback,
     useEffect,
     useState,
 } from 'react';
@@ -29,13 +30,13 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
 
     const [inputValue, setInputValue] = useState('');
 
-    const onValueChange: ChangeEventHandler<HTMLInputElement> = (
+    const onValueChange: ChangeEventHandler<HTMLInputElement> = useCallback((
         event: ChangeEvent<HTMLInputElement>
     ) => {
         if (event.target.value) {
             setInputValue(event.target.value);
         }
-    };
+    }, []);
 
     const sendInputValues = (
         currentValue: string,
@@ -54,10 +55,10 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
         return action;
     };
 
-    const calculateConvertedValue = (value: number): string => {
+    const calculateConvertedValue = useCallback((value: number): string => {
         let intPart = Math.trunc(value);
         return value - intPart > 0 ? value.toFixed(4) : intPart.toString();
-    };
+    }, []);
 
     useEffect(() => {
         if (conversionRate > 0 && inputValue !== '') {

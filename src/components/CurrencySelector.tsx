@@ -1,4 +1,4 @@
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useCallback } from 'react';
 import {
     Autocomplete,
     AutocompleteChangeReason,
@@ -23,7 +23,7 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
 }) => {
     const dispatch = useDispatch();
 
-    const createAction = (payload: CodeType): Action => {
+    const createAction = useCallback((payload: CodeType): Action => {
         let action: Action;
         action = {
             type:
@@ -34,9 +34,9 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
             toCode: { ...payload },
         };
         return action;
-    };
+    }, []);
 
-    const onChange = (
+    const onChange = useCallback((
         event: SyntheticEvent,
         value: CodeType | null,
         reason: AutocompleteChangeReason
@@ -45,7 +45,7 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
             let action = createAction(value!);
             dispatch(action);
         }
-    };
+    }, []);
 
     return (
         <Autocomplete
@@ -80,4 +80,4 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = ({
     );
 };
 
-export default CurrencySelector;
+export default React.memo(CurrencySelector);

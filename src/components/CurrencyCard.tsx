@@ -96,4 +96,4 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({
     );
 };
 
-export default CurrencyCard;
+export default React.memo(CurrencyCard);
