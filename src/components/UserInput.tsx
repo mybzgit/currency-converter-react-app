@@ -30,13 +30,20 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
 
     const [inputValue, setInputValue] = useState('');
 
-    const onValueChange: ChangeEventHandler<HTMLInputElement> = useCallback((
-        event: ChangeEvent<HTMLInputElement>
-    ) => {
-        if (event.target.value) {
-            setInputValue(event.target.value);
-        }
-    }, []);
+    const onValueChange: ChangeEventHandler<HTMLInputElement> = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            let inputValue = event.target.value;
+            const validValue = /^\d+\.?\d{0,4}$/g;
+            const invalidValue = /^0\d+/g;
+            if (invalidValue.test(inputValue))
+                inputValue = inputValue.substring(1, inputValue.length);
+            if (!validValue.test(inputValue)) return;
+            else {
+                setInputValue(inputValue);
+            }
+        },
+        []
+    );
 
     const sendInputValues = (
         currentValue: string,
