@@ -1,12 +1,12 @@
 import { createStore, Reducer, Store } from 'redux';
-import { CodeType } from './types';
+import { CodeType, ConversionRate } from './types';
 
 export type State = {
     fromCode: CodeType;
     toCode: CodeType;
     supportedCodes: CodeType[];
-    convertionRatesFromCode: number;
-    convertionRatesToCode: number;
+    convertionRatesFromCode: ConversionRate;
+    convertionRatesToCode: ConversionRate;
     fromInputValue: string;
     toInputValue: string;
 };
@@ -26,8 +26,8 @@ export type Action = {
     fromCode?: CodeType;
     toCode?: CodeType;
     supportedCodes?: CodeType[];
-    convertionRatesFromCode?: number;
-    convertionRatesToCode?: number;
+    convertionRatesFromCode?: ConversionRate;
+    convertionRatesToCode?: ConversionRate;
     fromInputValue?: string;
     toInputValue?: string;
 };
@@ -36,8 +36,8 @@ const initialState: State = {
     fromCode: { code: 'USD', description: 'United States Dollar' },
     toCode: { code: 'RUB', description: 'Russian Ruble' },
     supportedCodes: [],
-    convertionRatesFromCode: 0,
-    convertionRatesToCode: 0,
+    convertionRatesFromCode: {},
+    convertionRatesToCode: {},
     fromInputValue: '0',
     toInputValue: '0',
 };
@@ -47,12 +47,14 @@ const reducer: Reducer<State, Action> = (state = initialState, action) => {
         return {
             ...state,
             fromCode: { ...action.fromCode! },
+            convertionRatesFromCode: {}
         };
     }
     if (action.type == ActionTypes.SET_TO_CODE) {
         return {
             ...state,
             toCode: { ...action.toCode! },
+            convertionRatesToCode: {}
         };
     }
     if (action.type == ActionTypes.SWAP_CODES) {
@@ -60,6 +62,8 @@ const reducer: Reducer<State, Action> = (state = initialState, action) => {
             ...state,
             fromCode: { ...state.toCode },
             toCode: { ...state.fromCode },
+            convertionRatesFromCode: { ...state.convertionRatesToCode },
+            convertionRatesToCode: { ...state.convertionRatesFromCode },
         };
     }
     if (action.type == ActionTypes.SET_SUPPORTED_CODES) {
@@ -71,13 +75,13 @@ const reducer: Reducer<State, Action> = (state = initialState, action) => {
     if (action.type == ActionTypes.SET_CONVERSION_RATES_FROM_CODE) {
         return {
             ...state,
-            convertionRatesFromCode: action.convertionRatesFromCode!,
+            convertionRatesFromCode: { ...action.convertionRatesFromCode! },
         };
     }
     if (action.type == ActionTypes.SET_CONVERSION_RATES_TO_CODE) {
         return {
             ...state,
-            convertionRatesToCode: action.convertionRatesToCode!,
+            convertionRatesToCode: { ...action.convertionRatesToCode! },
         };
     }
     if (action.type == ActionTypes.SET_INPUT_VALUES) {

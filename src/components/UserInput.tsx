@@ -20,6 +20,12 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
             : state.convertionRatesToCode;
     });
 
+    const codeToConvert = useSelector((state: State) => {
+        return directionType === 'from'
+            ? state.toCode.code
+            : state.fromCode.code; 
+    })
+
     const currentValue = useSelector((state: State) => {
         return directionType === 'from'
             ? state.fromInputValue
@@ -68,24 +74,24 @@ const UserInput: React.FC<UserInputProps> = ({ directionType }) => {
     }, []);
 
     useEffect(() => {
-        if (conversionRate > 0 && inputValue !== '') {
+        if (conversionRate[codeToConvert] > 0 && inputValue !== '') {
             const newConvertedValue = calculateConvertedValue(
-                +inputValue * conversionRate
+                +inputValue * conversionRate[codeToConvert]
             );
             dispatch(sendInputValues(inputValue, newConvertedValue));
         }
     }, [inputValue]);
 
     useEffect(() => {
-        if (conversionRate > 0 && directionType === 'from') {
+        if (conversionRate[codeToConvert] > 0 && directionType === 'from') {
             const newConvertedValue = calculateConvertedValue(
-                +currentValue * conversionRate
+                +currentValue * conversionRate[codeToConvert]
             );
             dispatch(
                 sendInputValues(currentValue, newConvertedValue.toString())
             );
         }
-    }, [conversionRate]);
+    }, [codeToConvert, conversionRate[codeToConvert]]);
 
     return (
         <TextField

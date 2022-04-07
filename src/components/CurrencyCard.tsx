@@ -30,26 +30,15 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({
         return directionType === 'from' ? state.toCode : state.fromCode;
     });
 
-    const [conversionRates, setConversionRates] = useState<ConversionRate>({});
+    const conversionRates: ConversionRate = useSelector((state: State) => {
+        return directionType === 'from'
+            ? state.convertionRatesFromCode
+            : state.convertionRatesToCode;
+    });
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const action: Action = {
-            type:
-                directionType === 'from'
-                    ? ActionTypes.SET_CONVERSION_RATES_FROM_CODE
-                    : ActionTypes.SET_CONVERSION_RATES_TO_CODE,
-            convertionRatesFromCode:
-                directionType === 'from'
-                    ? conversionRates[currencyToConvert.code]
-                    : 0,
-            convertionRatesToCode:
-                directionType === 'to'
-                    ? conversionRates[currencyToConvert.code]
-                    : 0,
-        };
-        dispatch(action);
         setConvertedValue(conversionRates[currencyToConvert.code]);
     }, [currencyToConvert.code, conversionRates]);
 
@@ -57,18 +46,39 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({
         'https://v6.exchangerate-api.com/v6/f85e1ab717a788b92e1bf176/latest/';
 
     useEffect(() => {
-        axios
-            .get<ConversionRatesResponse>(
-                exchangeRatesUrl + selectedCurrency.code
-            )
-            .then((response) => {
-                if (response.data.result === 'success') {
-                    setConversionRates({ ...response.data.conversion_rates });
-                }
-            })
-            .catch((error) => {
-                setConvertedValue(0);
-            });
+        console.log(selectedCurrency, conversionRates)
+        if (Object.keys(conversionRates).length === 0) {
+            axios
+                .get<ConversionRatesResponse>(
+                    exchangeRatesUrl + selectedCurrency.code
+                )
+                .then((response) => {
+                    if (response.data.result === 'success') {
+                        const action: Action = {
+                            type:
+                                directionType === 'from'
+                                    ? ActionTypes.SET_CONVERSION_RATES_FROM_CODE
+                                    : ActionTypes.SET_CONVERSION_RATES_TO_CODE,
+                            convertionRatesFromCode:
+                                directionType === 'from'
+                                    ? {
+                                          ...response.data.conversion_rates,
+                                      }
+                                    : {},
+                            convertionRatesToCode:
+                                directionType === 'to'
+                                    ? {
+                                          ...response.data.conversion_rates,
+                                      }
+                                    : {},
+                        };
+                        dispatch(action);
+                    }
+                })
+                .catch((error) => {
+                    setConvertedValue(0);
+                });
+        }
     }, [selectedCurrency.code]);
 
     const unitInfo = `1 ${selectedCurrency.code} = ${convertedValue} ${currencyToConvert.code}`;
